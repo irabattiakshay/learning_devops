@@ -1,0 +1,68 @@
+// Use // To write comment, it is not a code, it is just description. It will not be executed.
+// al the code is written in between the pipeline{}
+
+pipeline{
+
+    agent{
+        This is a mandatory section
+        name of the VM/Server/windows/mac wehre the pipeline has to be executed
+        pipeline can also be executed on the same EC2 server where Jenkins is installed
+    }
+
+    tools{
+        This is not mandatory
+        If pipeline has to use specific version of any of the tools
+        mention the name of the tool that has been configured in the settings-tools section of Jenkins.
+        example: mymaven
+    }
+
+    triggers{
+        This is not mandatory
+        We can setup triggers directly on the pipeline job, just like we did in freestyle.
+        Or you can write code for POLLSCM and periodic trigger.
+    }
+
+    parameters{
+        // This is not mandatory
+        // Variables that store some data
+        // They allow us to run the pipeline
+        // This data can be passed when executed the pipeline
+        // Parameterized pipeline
+    }
+
+    envrionment{
+        // This is not mandatory
+        // Creates environment variable
+        // Stores data to be used withing this pipeline.
+    }
+
+    stages{
+        // This is the main section of pipeline
+        // This is a mandatory section.
+        // stages section consist of stage.
+        // The stage are jobs to be executed.
+        // They are executed in sequence.
+        // Can also be executed in parallel.
+
+        stage("Job1"){
+        // This is mandatory section
+            steps{
+                //This is mandatory section
+                // Here we write the commands, scripts to be executed.
+            }
+        }
+        stage("Job2"){
+            steps{
+                mvn pmd:pmd
+            }
+            post{
+                success{
+                    commands to be executed after the steps have been completed
+                }
+                failure{
+                    commands to be executed after the steps have been completed
+                }
+            }
+        }    
+    }
+}
