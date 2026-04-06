@@ -1,0 +1,38 @@
+pipeline{
+
+    agent any
+
+    tools{
+        maven 'mymaven'
+    }
+    parameters{
+        choice(name: 'ENV',choices: ['', 'Dev', 'QA'], description:'select the environment')
+    }
+
+    stages{
+        stage('Build on Dev ENV'){
+            when{
+                expression{
+                    params.ENV == 'Dev'
+                }
+            }
+            steps{
+                git 'https://github.com/Sonal0409/DevOpsCodeDemo.git'
+                sh 'mvn clean package'
+            }
+        }
+        
+        stage('Test on Test ENV'){
+            when{
+                expression{
+                    params.ENV == 'QA'
+                }
+            }
+            steps{
+                git 'https://github.com/Sonal0409/DevOpsCodeDemo.git'
+                sh 'mvn pmd:pmd'
+                sh 'mvn test'
+            }
+        }
+    }
+}

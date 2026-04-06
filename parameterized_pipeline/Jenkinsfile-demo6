@@ -1,0 +1,31 @@
+pipeline{
+
+    agent any
+
+    parameters{
+        // syntax to declare a variable
+        string(name: 'PERSON', defaultValue: 'Ravi', description: 'Name of an Employee')
+        string(name: 'Tool', defaultValue: 'Jenkins', description: 'Tool to learn')
+        choice(name: 'ENV', choices: ['DEV', 'test', 'prod'], description: 'These are env')
+        choice(name: 'branch', choices: ['dev', 'master', 'main'])
+
+    // choice = list of values/multiple values
+    // parameters are used/reffered in the stages
+    }
+
+    stages{
+        stage('Job1')
+        {
+            steps{
+                //steps to print variable values
+                //use the parameters => ${params.name}
+                // Go to parameter section, go to th given parameter name and fetch the value
+
+                echo "Hello ${params.PERSON}"
+                echo "Learn the devops tool ${params.Tool}"
+                echo "Work in the environment: ${params.ENV}"
+                echo "Work on the git branch: ${params.branch}"
+            }
+        }
+    }
+}

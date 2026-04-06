@@ -1,0 +1,33 @@
+pipeline{
+
+    agent any
+
+    tools{
+        maven 'mymaven'
+    }
+
+    stages{
+        stage('Clone the repo'){
+            steps{
+                git 'https://github.com/Sonal0409/DevOpsCodeDemo.git'
+            }
+        }
+
+        stage('Test on Test ENV'){
+            steps{
+                sh 'mvn test'
+                script{
+                    timeout(time: 10, unit: 'MINUTES'){
+                        input(id: 'DeployGate', message: 'Continue to Deploy')
+                    }
+                }
+            }
+        }
+
+        stage('Deploy Code'){
+            steps{
+                echo "deployed the code "
+            }
+        }
+    }
+}
