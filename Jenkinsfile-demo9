@@ -1,0 +1,25 @@
+pipeline{
+
+    agent any
+    tools{
+        maven 'mymaven'
+    }
+    parameters{
+        choice(name: 'ENV', choices:["Dev", 'QA'])
+    }
+    stages{
+        stage('Build on Dev ENV'){
+            steps{
+                script{
+                    def mvnCMD = [
+                        Dev: 'compile',
+                        QA: 'test'
+                    ]
+                    def CMD = mvnCMD[params.ENV]
+                    git 'https://github.com/Sonal0409/DevOpsCodeDemo.git'
+                    sh 'mvn ${CMD}'
+                }
+            }
+        }    
+    }
+}
