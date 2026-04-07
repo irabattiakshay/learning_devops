@@ -17,7 +17,7 @@ pipeline{
                     ]
                     def CMD = mvnCMD[params.ENV]
                     git 'https://github.com/Sonal0409/DevOpsCodeDemo.git'
-                    sh 'mvn ${CMD}'
+                    sh "mvn ${CMD}"
                 }
             }
         }    
