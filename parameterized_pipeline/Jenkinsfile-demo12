@@ -1,0 +1,22 @@
+pipeline{
+
+    agent {
+        docker {
+            image 'maven:3.8.5-openjdk-17'
+        }
+    }
+
+    stages{
+        stage('Clone Repository') {
+            steps {
+                git 'https://github.com/irabattiakshay/DevOpsCodeDemo.git'
+            }
+        }
+
+        stage('Test the code on Dynamic Agent') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+    }
+}
