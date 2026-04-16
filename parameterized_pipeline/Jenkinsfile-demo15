@@ -1,0 +1,33 @@
+pipeline{
+    agent any
+    tools{
+        maven 'mymaven'
+    }
+    stages{
+        stage('Checkout code'){
+            steps{
+                git 'https://github.com/irabattiakshay/SonarQubeCoverageJava.git'
+            }
+        }
+        stage('Build code'){
+            steps{
+                sh 'mvn package'
+            }
+        }
+        stage('SonarScan'){
+            environment{
+                scannerHome = tool 'sonartool'
+            }
+            steps{
+                withSonarQubeEnv('mysonar'){
+                    sh '''
+                    ${scannerHome}/bin/sonar-scanner \
+                    -Dsonar.projectKey=sonar-devops-irabattiakshay_sonar-devops-irabattiakshay-project \
+                    -Dsonar.java.binaries=target/classes \
+                    -Dsonar.organization=sonar-devops-irabattiakshay
+                    '''
+                }
+            }
+        }
+    }
+}
