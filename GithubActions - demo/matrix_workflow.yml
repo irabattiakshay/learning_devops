@@ -1,0 +1,35 @@
+name: Matrix build nodejs application
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  job1:
+    continue-on-error: true
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.operating-system }}
+    steps:
+      - name: Clone the repository
+        uses: actions/checkout@v6
+      - name: Install nodejs
+        uses: actions/setup-node@v6
+        with:
+          node-version: '18'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Execute tests cases
+        run: npm test
+      - name: Build the nodejs code
+        run: npm run build
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nodejs-artifact
+          path: dist/

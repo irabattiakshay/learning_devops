@@ -1,0 +1,29 @@
+name: build Python application
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+env:
+  PYTHON_VERSION: 3.11
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone the repository
+        uses: actions/checkout@v6
+      - name: Install Python {{ env.PYTHON_VERSION }} on runner
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION}}
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: set PythonPATH
+        run: echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
+      - name: Run tests
+        run: pytest tests --cov=app --cov-report=xml
