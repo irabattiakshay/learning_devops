@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysvc-np
+spec:
+  type: LoadBalancer
+  selector:
+    app: webserver
+  ports:
+    - targetPort: 80
+      port: 80

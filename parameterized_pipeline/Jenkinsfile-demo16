@@ -1,0 +1,99 @@
+def scan_type
+def target 
+pipeline {
+    agent any
+
+    parameters {
+        choice (
+            name: 'SCAN_TYPE',
+            choices: ['Baseline', 'APIS', 'Full'],
+            description: 'Select the type of scan to be performed'
+            )
+        
+        string(
+            name: 'TARGET',
+            defaultValue: 'https://medium.com/', //URL to scane
+            description: 'Target URL to be scanned'
+        ) 
+    }
+
+    stages {
+        stage('Setting up of the OWASP ZAP container'){
+            steps{
+                echo "Pulling image of ZAP --> Start"
+                sh 'docker pull ghcr.io/zaproxy/zaproxy:stable'
+                echo "Pulling image of ZAP is completed --> End"
+                echo "Running the ZAP container --> Starting container"
+                sh 'docker run -dt --name owasp-${BUILD_NUMBER} -p 8181:8080 ghcr.io/zaproxy/zaproxy:stable'
+            }
+        }
+
+        stage('Creating a working Directory in the container'){
+            steps{
+                echo "Connecting to container and execute command to create a working directory"
+                sh'docker exec owasp-${BUILD_NUMBER} mkdir -p /zap/wrk'
+            }
+        }
+
+        stage('Scan targe on owasp container'){
+            steps{
+                script{
+                    scan_type = "${params.SCAN_TYPE}"
+                    echo "---> scan_type: ${scan_type}"
+                    target = "${params.TARGET}"
+                    echo "---> target: ${target}"
+
+                    if (scan_type == 'Baseline'){
+                        sh """
+                            docker exec owasp-${BUILD_NUMBER} \
+                            zap-baseline.py \
+                            -t ${target} \
+                            -r report.html \
+                            -I
+                        """
+                    }
+                    else if (scan_type == 'APIS'){
+                        sh """
+                            docker exec owasp-${BUILD_NUMBER} \
+                            zap-api-scan.py \
+                            -t ${target} \
+                            -r report.html \
+                            -I
+                        """
+                    }
+                    else if (scan_type == 'Full'){
+                        sh """
+                            docker exec owasp-${BUILD_NUMBER} \
+                            zap-full-scan.py \
+                            -t ${target} \
+                            -r report.html \
+                            -I
+                        """
+                    }
+                    else {
+                        echo 'Something went wrong, please check the parameters provided'
+                    }
+                }
+            }
+        }
+
+        stage('Copy report to workspace'){
+            steps{
+                script{
+                    sh """
+                        docker cp owasp-${BUILD_NUMBER}:/zap/wrk/report.html ${WORKSPACE}/report.html
+                    """
+                }
+            }
+        }
+    }
+    post {
+        always {
+            echo 'removing the container after the scan is completed'
+            sh """
+                docker stop owasp-${BUILD_NUMBER}
+                docker rm owasp-${BUILD_NUMBER}
+            """
+        }
+    }
+}

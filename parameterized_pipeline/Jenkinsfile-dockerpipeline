@@ -1,0 +1,38 @@
+pipeline{
+    agent any
+    tools{
+        maven 'mymaven'
+    }
+    stages{
+        stage('clone the repo'){
+            steps{
+                git 'https://github.com/Sonal0409/DevOpsCodeDemo.git'
+            }
+        }
+        stage('Build Code'){
+            steps{
+                sh 'mvn clean package'
+            }
+        }
+        stage('Build Image'){
+            steps{
+                sh 'docker build -t myjavajenkins .'
+            }
+        }
+        stage('login and push image'){
+            steps{
+                withCredentials([string(credentialsId: 'DOCKERHUB_TOKEN', variable: 'DOCKERHUB_PASSWORD')]) {
+                // Now write docker login command which will fetch the password from variable
+                sh 'docker login -u irabattiakshay -p ${DOCKERHUB_PASSWORD}'
+                }
+                sh 'docker tag myjavajenkins irabattiakshay/myjavajenkins'
+                sh 'docker push irabattiakshay/myjavajenkins'
+            }
+        }
+        stage('Deploy the image'){
+            steps{
+                sh 'docker run -d -P irabattiakshay/myjavajenkins'
+            }
+        }
+    }
+}

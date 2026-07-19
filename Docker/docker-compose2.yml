@@ -1,0 +1,14 @@
+networks:
+  mynet1:
+volumes:
+  myvol:
+services:
+  mynodeapp:
+    build: .
+    image: mynodeimage
+    ports:
+      - "8989:80"
+    networks:
+      - mynet1
+    volumes:
+      - myvol:/tmp

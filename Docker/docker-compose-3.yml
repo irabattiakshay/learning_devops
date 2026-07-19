@@ -1,0 +1,59 @@
+networks:
+  frontend:
+  backend:
+volumes:
+  db-data:  
+
+services:
+# Redis service for storing votes
+  redis:
+    image: "redis:alpine"
+    networks:
+      - frontend
+    deploy:
+      replicas: 1
+# Database service for storing results
+  db:
+    image: "postgres:9.4"
+    networks:
+      - backend
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: db
+      POSTGRES_HOST_AUTH_METHOD: trust
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+# Voting service for users to vote
+  vote:
+    image: "dockersamples/examplevotingapp_vote:before"
+    networks:
+      - frontend
+    depends_on:
+      - redis
+    deploy:
+      replicas: 2
+    ports:
+      - "5000:80"
+# Result service for displaying results  
+  result:
+    image: "dockersamples/examplevotingapp_result:before"
+    networks:
+      - backend
+    depends_on:
+      - db
+    deploy:
+      replicas: 2
+    ports:
+      - "5001:80"
+# Worker service for processing votes 
+  worker:
+    image: "dockersamples/examplevotingapp_worker"
+    networks:
+      - frontend
+      - backend
+    depends_on:
+      - redis
+      - db

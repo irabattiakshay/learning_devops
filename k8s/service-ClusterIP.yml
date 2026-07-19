@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysvc
+spec:
+  type: ClusterIP
+  selector:       #Selects pods with matching labels
+    app: webserver
+  ports:
+    - targetPort: 80  # Application port on the pod
+      port: 8081      # Port exposed by the service      

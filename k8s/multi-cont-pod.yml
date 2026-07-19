@@ -1,0 +1,19 @@
+# provide the name of the schema or library that k8s requires to create this kind of object
+# the value of apiVersion is given by K8s
+apiVersion: v1
+kind: Pod   # kind of object to be created by K8s. The value is given by K8s
+metadata:   # give the pod name and labels to identify the pod
+  name: multi-cont-pod
+  labels:   # Its a key value pair to identify the pod. Labels are used for querying a group of pods
+    author: akshay
+    app: webserver
+    env: test
+spec:   # provide the specification of the pod
+    containers:   # provide the list of containers to be created in the pod
+    - name: c1
+      image: nginx
+    - name: c2
+      image: tomcat
+    - name: c3
+      image: ubuntu
+      command: ["/bin/bash", "-c", "sleep 6000"]
